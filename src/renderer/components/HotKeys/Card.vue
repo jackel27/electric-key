@@ -12,9 +12,6 @@
   <div id="Card">
     <div class="ui link cards">
       <div class="card">
-<!--         <div class="image">
-          <img class="icons" src="/static/notepad.png">
-        </div> -->
         <div class="content">
           <!-- Prop 1 -->
           <img class="left floated mini ui image" src="/static/notepad.png">
@@ -29,13 +26,14 @@
             CTRL + SHIFT + N
           </div>
         </div>
-        <div class="extra centered content">
+        <!-- Instead of text, border color green = enabled, red = disabled. -->
+<!--         <div class="extra centered content">
           <span class="ui center aligned grid">
-            <!-- Prop 5 -->
+            Prop 5
             Enabled
             <i class="check icon"></i>
           </span>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
