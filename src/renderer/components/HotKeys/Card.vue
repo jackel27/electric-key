@@ -19,11 +19,11 @@
           <div class="header">Notepad.exe</div>
           <div class="meta">
             <!-- Prop 3 -->
-            <a>C:\System32\Notepad.exe</a>
+            <a>{{ path }}</a>
           </div>
           <div class="description right floated">
             <!-- Prop 4 -->
-            CTRL + SHIFT + N
+            {{ shortcut }}
           </div>
         </div>
         <!-- Instead of text, border color green = enabled, red = disabled. -->
@@ -50,6 +50,8 @@ export default {
     console.log('Card is Mounted!')
   },
   props: {
+    path: '',
+    shortcut: ''
   },
   data () {
     return {

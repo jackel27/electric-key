@@ -70,7 +70,7 @@
           <i class="remove icon"></i>
           Cancel
         </div>
-        <div class="ui green ok inverted button">
+        <div class="ui green ok inverted button" @click="Save()">
           <i class="checkmark icon"></i>
           Save
         </div>
@@ -81,6 +81,9 @@
 </template>
 
 <script>
+import iconExtractor from 'icon-extractor'
+import path from 'path'
+import fs from 'fs'
 export default {
   name: 'AddNew',
   components: {
@@ -88,7 +91,10 @@ export default {
   computed: {
   },
   mounted () {
-    console.log('AddNew is Mounted!')
+    // this.$electron.remote.globalShortcut.register('s+CommandOrControl', () => {
+    //   console.log('CommandOrControl+X is pressed 23')
+    // })
+    // console.log('AddNew is Mounted!')
   },
   props: {
     modalactive: false
@@ -100,10 +106,34 @@ export default {
       HotKeySet: new Set(),
       HotKeyArray: ['Click to Edit / Clear'],
       ListenerActive: false,
-      KeyUpQty: 0
+      KeyUpQty: 0,
+      ElectronKey: []
     }
   },
   methods: {
+    Save () {
+      iconExtractor.emitter.on('icon', (iconData) => {
+        this.$parent.localStorage.push({
+          icon: iconData.Base64ImageData,
+          path: this.Path,
+          shortcut: this.ElectronKey.join(' + ')
+        })
+        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('desktop'), '\\hotkey-manager\\', 'hotkeys.json'), JSON.stringify(this.$parent.localStorage))
+      })
+      iconExtractor.getIcon('booya?', this.Path)
+      let savePath = this.$electron.remote.app.getPath('desktop')
+      console.log(savePath)
+      // console.log(this.$parent.localStorage, ' <------localStorage')
+      //
+      // no more local storage
+      // window.localStorage.setItem('hotkey-manager', JSON.stringify(this.$parent.localStorage))
+      // this.$electron.remote.globalShortcut.unregisterAll()
+      // for (let x = 0; x < this.$parent.localStorage.length; x++) {
+      //   this.$electron.remote.globalShortcut.register(this.$parent.localStorage[x].shortcut, () => {
+      //     this.$electron.remote.shell.openExternal(this.$parent.localStorage[x].path)
+      //   })
+      // }
+    },
     ChooseFile () {
       this.$electron.remote.dialog.showOpenDialog({properties: ['openFile']}, (cb) => {
         console.log(cb)
@@ -115,8 +145,29 @@ export default {
       this.HotKeySet.add(e.key)
       this.HotKeyArray = [...this.HotKeySet]
     },
+    SortSwitch (val) {
+      switch (val) {
+        case 'Control':
+          this.ElectronKey.push('CommandOrControl')
+          break
+        case 'Shift':
+          this.ElectronKey.push('Shift')
+          break
+        case 'Alt':
+          this.ElectronKey.push('Alt')
+          break
+        case 'Meta':
+          this.ElectronKey.push('Super')
+          break
+        default:
+          this.ElectronKey.push(val.toUpperCase())
+      }
+    },
     SortKeys () {
-      // this.HotKeySet.
+      for (let x = 0; x < this.HotKeyArray.length; x++) {
+        this.SortSwitch(this.HotKeyArray[x])
+      }
+      console.log(this.ElectronKey.join(' + '))
     },
     OnKeyHandlerUp (e) {
       this.KeyUpQty++
@@ -128,12 +179,14 @@ export default {
     AddListener () {
       this.ListenerActive = true
       this.KeyUpQty = 0
+      this.ElectronKey = []
       this.HotKeySet.clear()
       this.HotKeyArray = []
       window.addEventListener('keydown', this.OnKeyHandler)
       window.addEventListener('keyup', this.OnKeyHandlerUp)
     },
     RemoveListener () {
+      this.SortKeys()
       this.KeyUpQty = 0
       this.ListenerActive = false
       window.removeEventListener('keydown', this.OnKeyHandler)
