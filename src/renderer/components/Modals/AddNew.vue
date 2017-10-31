@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import iconExtractor from 'icon-extractor'
+import AssociatedIcon from 'associated-icon'
 import path from 'path'
 import fs from 'fs'
 export default {
@@ -91,17 +91,14 @@ export default {
   computed: {
   },
   mounted () {
-    // this.$electron.remote.globalShortcut.register('s+CommandOrControl', () => {
-    //   console.log('CommandOrControl+X is pressed 23')
-    // })
-    // console.log('AddNew is Mounted!')
   },
   props: {
     modalactive: false
   },
   data () {
     return {
-      Path: '',
+      Icon: '',
+      Path: 'somepath',
       HotKey: 'Click to Edit / Clear',
       HotKeySet: new Set(),
       HotKeyArray: ['Click to Edit / Clear'],
@@ -112,27 +109,17 @@ export default {
   },
   methods: {
     Save () {
-      iconExtractor.emitter.on('icon', (iconData) => {
+      let associatedIcon = new AssociatedIcon() // or new AssociatedIcon(true); (this will use execFile instead of spawn, so this will work in electron)
+      associatedIcon.getBase64Icon(this.Path).then((cb) => {
+        this.Icon = cb.Base64Data
         this.$parent.localStorage.push({
-          icon: iconData.Base64ImageData,
+          icon: this.Icon,
           path: this.Path,
           shortcut: this.ElectronKey.join(' + ')
         })
-        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('desktop'), '\\hotkey-manager\\', 'hotkeys.json'), JSON.stringify(this.$parent.localStorage))
+        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\hotkey-manager\\', 'hotkeys.json'), JSON.stringify(this.$parent.localStorage))
+        this.$parent.modalAddNew = false
       })
-      iconExtractor.getIcon('booya?', this.Path)
-      let savePath = this.$electron.remote.app.getPath('desktop')
-      console.log(savePath)
-      // console.log(this.$parent.localStorage, ' <------localStorage')
-      //
-      // no more local storage
-      // window.localStorage.setItem('hotkey-manager', JSON.stringify(this.$parent.localStorage))
-      // this.$electron.remote.globalShortcut.unregisterAll()
-      // for (let x = 0; x < this.$parent.localStorage.length; x++) {
-      //   this.$electron.remote.globalShortcut.register(this.$parent.localStorage[x].shortcut, () => {
-      //     this.$electron.remote.shell.openExternal(this.$parent.localStorage[x].path)
-      //   })
-      // }
     },
     ChooseFile () {
       this.$electron.remote.dialog.showOpenDialog({properties: ['openFile']}, (cb) => {
@@ -171,7 +158,6 @@ export default {
     },
     OnKeyHandlerUp (e) {
       this.KeyUpQty++
-      // console.log(this.HotKeySet.size + ' === ' + this.KeyUpQty)
       if (this.HotKeySet.size === this.KeyUpQty) {
         this.RemoveListener()
       }

@@ -6,6 +6,7 @@ import router from './router'
 import store from './store'
 import 'semantic-ui-css/semantic.css'
 import fsextra from 'fs-extra'
+// Vue.prototype.$vClickOutside = directive
 window.addEventListener('beforeunload', () => {
   remote.globalShortcut.unregisterAll()
 })

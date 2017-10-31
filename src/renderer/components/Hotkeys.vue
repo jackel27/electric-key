@@ -5,12 +5,14 @@
   #Hotkeys {
     display: flex;
     padding: 12px;
+    flex-wrap: wrap;
   }
 </style>
 
 <template>
   <div id="Hotkeys">
-    <card v-for="(item, key) in localStorage" :key="key" :path='item.path' :shortcut='item.shortcut'></card>
+    <context-menu v-on-clickaway="outsideClick" v-if="contextmenu" :left="left" :top="top"></context-menu>
+    <card v-if="item" :uniqueid="key" v-for="(item, key) in localStorage" :icon="item.icon" :key="key" :path='item.path' :shortcut='item.shortcut'></card>
     <add-new :modalactive="modalAddNew"></add-new>
     <div class="ui link cards">
       <div class="card" @click="AddNew()">
@@ -23,45 +25,33 @@
 </template>
 
 <script>
-import path from 'path'
-import fs from 'fs'
+import ContextMenu from '@/components/ContextMenus/ContextMenu'
+import { directive as onClickaway } from 'vue-clickaway'
+import fs from 'fs-extra'
 import AddNew from '@/components/Modals/AddNew'
 import Card from '@/components/HotKeys/Card'
 export default {
   name: 'Hotkeys',
   components: {
     AddNew,
-    Card
+    Card,
+    ContextMenu
   },
   computed: {
   },
   mounted () {
-    let appDataPath = this.$electron.remote.app.getPath('desktop')
-    console.log('output is: ', fs.existsSync(appDataPath, '\\hotkey-manager\\', 'hotkeys.json'))
-    fs.open(path.join(appDataPath, '\\hotkey-manager\\', 'hotkeys.json'), 'wx', (err, fd) => {
-      if (err) {
-        if (err.code === 'EEXIST') {
-          console.log('file already exists!')
-          fs.readFile(path.join(appDataPath, '\\hotkey-manager\\', 'hotkeys.json'), (err, cb) => {
-            if (err) console.log(err)
-            console.log(appDataPath, ' <----?')
-            // console.log('file is ', JSON.parse(cb.toString('utf-8')))
-            this.localStorage = JSON.parse(cb.toString('utf-8'))
-          })
-          // return
-        } else {
-          // throw err
-          console.log('W?HAT IN THE HECK!')
-          fs.writeFile(path.join(appDataPath, '\\hotkey-manager\\', 'hotkeys.json'), '[]')
-        }
-      }
+    let appDataPath = this.$electron.remote.app.getPath('appData')
+    let path = appDataPath + '\\hotkey-manager\\' + 'hotkeys.json'
+    // Ensure directory and file exist......
+    fs.ensureFile(path, err => {
+      // file has now been created, including the directory it is to be placed in
+      if (err) console.log(err)
     })
-    // local storage to disk...
-    // this.localStorage = JSON.parse(window.localStorage.getItem('hotkey-manager'))
-    // if (this.localStorage === null) {
-    //   this.localStorage = []
-    //   window.localStorage.setItem('hotkey-manager', JSON.stringify('[]'))
-    // }
+    fs.readJson(path).then((cb) => {
+      this.localStorage = cb
+    }).catch((error) => {
+      console.log(error)
+    })
   },
   props: {
   },
@@ -69,12 +59,31 @@ export default {
     return {
       localStorage: [''],
       modalAddNew: false,
-      asdf: 'asdf'
+      asdf: 'asdf',
+      left: '',
+      top: '',
+      contextmenu: false
     }
   },
+  directives: {
+    onClickaway
+  },
   methods: {
+    outsideClick () {
+      console.log('outside clicked! ')
+      this.contextmenu = false
+    },
     AddNew () {
       this.modalAddNew = !this.modalAddNew
+    },
+    clickHandler (e) {
+      console.log('handling....')
+      this.contextmenu = true
+      console.log('handling right click... ', e)
+      console.log(e.screenX, 'x  <--->  y', e.screenY)
+      // left and top
+      this.top = e.y
+      this.left = e.x
     }
   }
 }
