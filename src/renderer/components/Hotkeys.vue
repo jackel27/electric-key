@@ -6,6 +6,7 @@
     display: flex;
     padding: 12px;
     flex-wrap: wrap;
+    margin-left: 250px;
   }
 </style>
 
