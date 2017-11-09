@@ -8,10 +8,14 @@
     flex-wrap: wrap;
     margin-left: 250px;
   }
+  .card {
+    height: 170px;
+  }
 </style>
 
 <template>
   <div id="Hotkeys">
+    <side-bar></side-bar>
     <context-menu v-on-clickaway="outsideClick" v-if="contextmenu" :left="left" :top="top"></context-menu>
     <card v-if="item" :uniqueid="key" v-for="(item, key) in localStorage" :icon="item.icon" :key="key" :path='item.path' :shortcut='item.shortcut'></card>
     <add-new :modalactive="modalAddNew"></add-new>
@@ -31,19 +35,30 @@ import { directive as onClickaway } from 'vue-clickaway'
 import fs from 'fs-extra'
 import AddNew from '@/components/Modals/AddNew'
 import Card from '@/components/HotKeys/Card'
+import SideBar from '@/components/SideBar/SideBar'
 export default {
   name: 'Hotkeys',
   components: {
     AddNew,
     Card,
-    ContextMenu
+    ContextMenu,
+    SideBar
   },
   computed: {
   },
   mounted () {
     let appDataPath = this.$electron.remote.app.getPath('appData')
     let path = appDataPath + '\\hotkey-manager\\' + 'hotkeys.json'
-    // Ensure directory and file exist......
+    let categories = appDataPath + '\\hotkey-manager\\' + 'categories.json'
+    // Ensure directory and file exist for both......
+    fs.ensureFile(categories, err => {
+      if (err) console.log(err)
+    })
+    fs.readJson(categories).then((cb) => {
+      this.categories = cb
+    }).catch((error) => {
+      console.log(error)
+    })
     fs.ensureFile(path, err => {
       // file has now been created, including the directory it is to be placed in
       if (err) console.log(err)
@@ -58,6 +73,7 @@ export default {
   },
   data () {
     return {
+      categories: [''],
       localStorage: [''],
       modalAddNew: false,
       asdf: 'asdf',

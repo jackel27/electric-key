@@ -59,11 +59,29 @@
           {{ HotKeyArray.join(' + ') }}
 
         </h1>
+              <div class="ui compact menu">
+          <div class="ui dropdown simple item">
+            Category: {{ setcategory }}
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <!-- Categories go here.... -->
+              <a v-for="cat in $parent.categories" @click="CatSelect(cat)" class="item">{{ cat }}</a>
+              <div class="item">
+                <div class="ui icon input">
+                  <!-- input for add category.. keypress enter 13... -->
+                  <input type="text" @keyup.enter="CatSelect(category)" v-model="category" placeholder="Add Category...">
+                  <i class="plus icon"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <button class="ui active select-button button" @click="ChooseFile()">
           <i class="file icon"></i>
           Path to Shortcut
         </button>
         <p id="path-text"> {{ Path }} </p>
+
       </div>
       <div class="actions">
         <div class="ui red basic cancel inverted button" @click="$parent.AddNew">
@@ -97,7 +115,9 @@ export default {
   },
   data () {
     return {
+      setcategory: '',
       Icon: '',
+      category: 'General',
       Path: 'somepath',
       HotKey: 'Click to Edit / Clear',
       HotKeySet: new Set(),
@@ -108,11 +128,16 @@ export default {
     }
   },
   methods: {
+    CatSelect (val) {
+      this.category = val
+      this.setcategory = val
+    },
     Save () {
       let associatedIcon = new AssociatedIcon() // or new AssociatedIcon(true); (this will use execFile instead of spawn, so this will work in electron)
       associatedIcon.getBase64Icon(this.Path).then((cb) => {
         this.Icon = cb.Base64Data
         this.$parent.localStorage.push({
+          category: this.category,
           icon: this.Icon,
           path: this.Path,
           shortcut: this.ElectronKey.join(' + ')
@@ -120,6 +145,12 @@ export default {
         fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\hotkey-manager\\', 'hotkeys.json'), JSON.stringify(this.$parent.localStorage))
         this.$parent.modalAddNew = false
       })
+      if (!~this.$parent.categories.indexOf(this.category)) {
+        this.$parent.categories.push(this.category)
+        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\hotkey-manager\\', 'categories.json'), JSON.stringify(this.$parent.categories))
+      } else {
+        console.log('Found!')
+      }
     },
     ChooseFile () {
       this.$electron.remote.dialog.showOpenDialog({properties: ['openFile']}, (cb) => {
