@@ -17,7 +17,7 @@
   <div id="Hotkeys">
     <side-bar></side-bar>
     <context-menu v-on-clickaway="outsideClick" v-if="contextmenu" :left="left" :top="top"></context-menu>
-    <card v-if="item" :uniqueid="key" v-for="(item, key) in localStorage" :icon="item.icon" :key="key" :path='item.path' :shortcut='item.shortcut'></card>
+    <card v-if="activecat === 'all' || item && item.category == activecat" :uniqueid="key" v-for="(item, key) in localStorage" :icon="item.icon" :key="key" :path='item.path' :shortcut='item.shortcut'></card>
     <add-new :modalactive="modalAddNew"></add-new>
     <div class="ui link cards">
       <div class="card" @click="AddNew()">
@@ -65,6 +65,14 @@ export default {
     })
     fs.readJson(path).then((cb) => {
       this.localStorage = cb
+      cb.forEach((item) => {
+        console.log(item.shortcut)
+        this.$electron.remote.globalShortcut.register(item.shortcut, () => {
+          this.$electron.shell.openExternal(item.path)
+          console.log('opening... ', item.path.split('\\').pop())
+        })
+      })
+      console.log(cb)
     }).catch((error) => {
       console.log(error)
     })
@@ -73,8 +81,9 @@ export default {
   },
   data () {
     return {
-      categories: [''],
-      localStorage: [''],
+      activecat: '',
+      categories: [],
+      localStorage: [],
       modalAddNew: false,
       asdf: 'asdf',
       left: '',

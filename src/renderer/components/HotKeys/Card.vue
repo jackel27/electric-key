@@ -11,7 +11,7 @@
 <template>
   <div :id="uniqueid" @contextmenu="$parent.clickHandler">
     <div class="ui link cards">
-      <div class="card">
+      <div class="card" @click="openItem()">
         <div class="content">
           <!-- Prop 1 -->
           <!-- <img src="data:image/png;base64, -->
@@ -63,6 +63,10 @@ export default {
     }
   },
   methods: {
+    openItem () {
+      this.$electron.shell.openExternal(this.path)
+      console.log('opening... ', this.path.split('\\').pop())
+    }
   }
 }
 </script>
