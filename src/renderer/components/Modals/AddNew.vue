@@ -142,12 +142,12 @@ export default {
           path: this.Path,
           shortcut: this.ElectronKey.join(' + ')
         })
-        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\hotkey-manager\\', 'hotkeys.json'), JSON.stringify(this.$parent.localStorage))
+        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\electric-key\\', 'hotkeys.json'), JSON.stringify(this.$parent.localStorage))
         this.$parent.modalAddNew = false
       })
       if (!~this.$parent.categories.indexOf(this.category)) {
         this.$parent.categories.push(this.category)
-        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\hotkey-manager\\', 'categories.json'), JSON.stringify(this.$parent.categories))
+        fs.writeFileSync(path.join(this.$electron.remote.app.getPath('appData'), '\\electric-key\\', 'categories.json'), JSON.stringify(this.$parent.categories))
       } else {
         console.log('Found!')
       }

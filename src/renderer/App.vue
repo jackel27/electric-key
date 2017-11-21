@@ -10,7 +10,7 @@
   import MyHeader from '@/components/MyHeader'
   import MyMenu from '@/components/MyMenu'
   export default {
-    name: 'hotkey-manager',
+    name: 'electric-key',
     components: {
       MyHeader,
       MyMenu

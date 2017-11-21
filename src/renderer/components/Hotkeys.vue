@@ -48,8 +48,8 @@ export default {
   },
   mounted () {
     let appDataPath = this.$electron.remote.app.getPath('appData')
-    let path = appDataPath + '\\hotkey-manager\\' + 'hotkeys.json'
-    let categories = appDataPath + '\\hotkey-manager\\' + 'categories.json'
+    let path = appDataPath + '\\electric-key\\' + 'hotkeys.json'
+    let categories = appDataPath + '\\electric-key\\' + 'categories.json'
     // Ensure directory and file exist for both......
     fs.ensureFile(categories, err => {
       if (err) console.log(err)

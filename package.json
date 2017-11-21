@@ -1,5 +1,5 @@
 {
-  "name": "hotkey-manager",
+  "name": "electric-key",
   "version": "0.0.0",
   "author": "JackeL <it.davidkaiser@gmail.com>",
   "description": "Set up hotkeys to open specific files or programs.",
@@ -19,7 +19,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "hotkey-manager",
+    "productName": "electric-key",
     "appId": "org.simulatedgreg.electron-vue",
     "directories": {
       "output": "build"

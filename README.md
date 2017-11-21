@@ -1,23 +1,42 @@
-# hotkey-manager
+# Jackel's Electric-Key
 
-> Set up hotkeys to open specific files or programs.
+> Set up hotkeys to open specific files or programs. Made with Electron.
+This is currently a work in progress. Functionality is present though. No releases as of yet.
+### TODOS
+
+* <strike> Find out why duplicates objects are saving to parent.localStorage on the second attempt </strike>
+* <strike> Bug concerning fs-extra about not creating directories if they do not exist. files yes, but not directories... </strike>
+* icon is extracting well, but images are not. need a default icon in place
+* <strike> Bind the hotkeys to electron</strike>
+* Add constraints for redundant shortcuts....
+* context-menu needs a "move to..."
+* context-menu needs functionality for edit, delete, and move to
+* A general folder needs to be created and static.
+* allow user to delete folders. Upon deletion, items redirect to general folder.
+* prevent duplicate folder names
+* prevent duplicate shortcuts
+* prevent duplicate paths
+* prompt user upon duplication flags. give user option as to what they want to do
+* need some graphic swag (icons, etc...)
+
+
+### Future Goals
+
+* Enable Profiles
+* Adjust hotkey input field
+
 
 #### Build Setup
 
 ``` bash
 # install dependencies
-npm install
+yarn install
 
 # serve with hot reload at localhost:9080
-npm run dev
+yarn dev
 
-# build electron application for production
-npm run build
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
-
+# build electron app for production
+yarn run build
 ```
 
 ---
